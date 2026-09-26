@@ -1,4 +1,4 @@
-"""养护计划接口：维护养护计划，覆盖提交审批、确认批复、作废计划等动作。"""
+"""养护计划接口：维护养护计划，覆盖提交审批、确认批复、驳回计划、作废计划、恢复重编等动作。"""
 from __future__ import annotations
 
 from typing import Any
@@ -13,13 +13,13 @@ router = APIRouter(prefix="/api/plan", tags=["养护计划"])
 service = PlanService()
 
 LIST_FIELDS = ["计划编号", "养护类型", "养护对象", "计划工期", "预算金额", "编制人员", "审批人员", "计划状态"]
-STATUSES = ["待编制", "待审批", "已批复", "已作废"]
+STATUSES = ["待编制", "待审批", "已批复", "已驳回", "已作废"]
 
 
 @router.get("", response_model=PageResult[dict])
 def list_entries(
     keyword: str | None = Query(default=None, description="按计划编号检索"),
-    status: str | None = Query(default=None, description="待编制、待审批、已批复、已作废"),
+    status: str | None = Query(default=None, description="待编制、待审批、已批复、已驳回、已作废"),
     page: int = 1,
     size: int = 20,
 ) -> PageResult[dict]:
@@ -28,6 +28,13 @@ def list_entries(
         raise HTTPException(status_code=400, detail="每页最多 200 条，请缩小分页范围")
     items, total = service.list_entries(keyword=keyword, status=status, page=page, size=size)
     return PageResult(items=items, total=total, page=page, size=size)
+
+
+@router.get("/export")
+def export_entries() -> dict[str, Any]:
+    """导出养护计划清单：返回当前过滤条件下的全量数据。"""
+    items, total = service.list_entries(page=1, size=10000)
+    return {"module": "plan", "total": total, "items": items}
 
 
 @router.get("/{entry_id}", response_model=dict)
@@ -41,25 +48,27 @@ def get_entry(entry_id: int) -> dict:
 
 @router.post("", response_model=ActionResult)
 def create_entry(payload: EntryPayload) -> ActionResult:
-    """登记一条养护计划，缺字段时说明原因而不是静默丢弃。"""
-    entry, missing = service.create_entry(payload.values)
+    """登记一条养护计划，缺字段时说明原因而不是静默丢弃；重复提交返回可辨认的回执。"""
+    entry, missing, message, code = service.create_entry(payload.values)
     if missing:
         return ActionResult(ok=False, message=f"缺少必填字段：{'、'.join(missing)}")
-    return ActionResult(ok=True, message="养护计划已登记", entry=entry)
+    return ActionResult(ok=True, message=message, entry=entry, code=code or None)
 
 
-@router.post("/{entry_id}/actions", response_model=ActionResult)
-def run_action(entry_id: int, payload: EntryPayload) -> ActionResult:
-    """对单条养护计划执行提交审批、确认批复、作废计划；不允许的动作会被拦下并说明原因。"""
-    action = str(payload.values.get("action") or "").strip()
-    entry, message = service.run_action(entry_id, action)
+@router.put("/{entry_id}", response_model=ActionResult)
+def update_entry(entry_id: int, payload: EntryPayload) -> ActionResult:
+    """驳回或作废后重新打开表单继续修改：预算金额与计划工期保留，作废的保存后恢复为待编制。"""
+    entry, message = service.update_entry(entry_id, payload.values)
     if entry is None:
         return ActionResult(ok=False, message=message)
     return ActionResult(ok=True, message=message, entry=entry)
 
 
-@router.get("/export")
-def export_entries() -> dict[str, Any]:
-    """导出养护计划清单：返回当前过滤条件下的全量数据。"""
-    items, total = service.list_entries(page=1, size=10000)
-    return {"module": "plan", "total": total, "items": items}
+@router.post("/{entry_id}/actions", response_model=ActionResult)
+def run_action(entry_id: int, payload: EntryPayload) -> ActionResult:
+    """对单条养护计划执行提交审批、确认批复、驳回计划、作废计划、恢复重编；不允许的动作会被拦下并说明原因。"""
+    action = str(payload.values.get("action") or "").strip()
+    entry, message = service.run_action(entry_id, action)
+    if entry is None:
+        return ActionResult(ok=False, message=message)
+    return ActionResult(ok=True, message=message, entry=entry)
