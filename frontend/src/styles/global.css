@@ -33,3 +33,59 @@ body { margin: 0; background: #f6f8fb; color: #1f2937; }
 .link { border: none; background: none; color: var(--brand); cursor: pointer; padding: 0; }
 .page-foot { display: flex; justify-content: space-between; margin-top: 8px; font-size: 12px; color: var(--muted); }
 .error-text { color: #b42318; }
+.muted-text { color: var(--muted); }
+.btn.small { padding: 3px 10px; font-size: 12px; }
+.link.danger { color: #b42318; }
+
+/* 统一横幅：成功 / 失败 / 警示 / 普通说明 */
+.banner { display: flex; align-items: center; gap: 10px; margin: 8px 0; padding: 8px 12px; border-radius: 6px; font-size: 13px; }
+.banner.error { background: #fef3f2; border: 1px solid #fecdca; color: #b42318; }
+.banner.success { background: #ecfdf3; border: 1px solid #abefc6; color: #067647; }
+.banner.warn { background: #fffaeb; border: 1px solid #fedf89; color: #b54708; }
+.banner.info { background: #eff8ff; border: 1px solid #b2ddff; color: #175cd3; }
+.banner .btn { margin-left: auto; }
+
+/* 状态徽标 */
+.status-badge { display: inline-block; padding: 1px 8px; border-radius: 10px; font-size: 12px; }
+.status-badge[data-status="待编制"] { background: #f2f4f7; color: #475467; }
+.status-badge[data-status="待审批"] { background: #eff8ff; color: #175cd3; }
+.status-badge[data-status="已批复"] { background: #ecfdf3; color: #067647; }
+.status-badge[data-status="已驳回"] { background: #fef3f2; color: #b42318; }
+.status-badge[data-status="已作废"] { background: #fffaeb; color: #b54708; }
+
+/* 列表加载/空态/失败态 */
+.feedback-cell { padding: 24px 12px !important; text-align: center; }
+.feedback-state { display: flex; flex-direction: column; align-items: center; gap: 8px; color: var(--muted); font-size: 13px; }
+.feedback-state.is-error { color: #b42318; }
+.feedback-icon { font-size: 20px; }
+
+/* 弹窗表单 */
+.modal-mask { position: fixed; inset: 0; background: rgba(16, 24, 40, 0.45); display: flex; align-items: center; justify-content: center; z-index: 50; }
+.modal { width: min(760px, 92vw); max-height: 90vh; overflow-y: auto; background: #fff; border-radius: 10px; box-shadow: 0 20px 48px rgba(16, 24, 40, 0.24); }
+.modal-head { display: flex; align-items: center; justify-content: space-between; padding: 14px 18px; border-bottom: 1px solid var(--border); }
+.modal-head h3 { margin: 0; font-size: 15px; }
+.modal-close { border: none; background: none; font-size: 20px; line-height: 1; color: var(--muted); cursor: pointer; }
+.modal .banner, .modal .plan-form { margin-left: 18px; margin-right: 18px; }
+.modal-feedback { padding: 24px 18px; text-align: center; display: flex; flex-direction: column; gap: 10px; align-items: center; }
+.modal-foot { display: flex; justify-content: flex-end; gap: 8px; padding: 12px 18px; margin-top: 12px; border-top: 1px solid var(--border); }
+
+/* 分步条：驳回/作废重开时高亮当前回到的档位 */
+.step-bar { display: flex; gap: 8px; list-style: none; margin: 12px 18px; padding: 0; }
+.step-item { flex: 1; display: flex; align-items: center; gap: 8px; padding: 8px 12px; border: 1px solid var(--border); border-radius: 8px; background: #f9fafb; font-size: 13px; color: var(--muted); }
+.step-item.active { border-color: var(--brand); background: #eff8ff; color: #175cd3; font-weight: 600; }
+.step-item.done .step-no { background: var(--brand); border-color: var(--brand); color: #fff; }
+.step-no { display: inline-flex; width: 20px; height: 20px; align-items: center; justify-content: center; border: 1px solid var(--border); border-radius: 50%; font-size: 12px; background: #fff; }
+
+/* 表单栅格 */
+.form-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px 16px; margin-bottom: 8px; }
+.form-item span { display: block; font-size: 12px; color: var(--muted); margin-bottom: 4px; }
+.form-item em { color: #b42318; font-style: normal; }
+.form-item input, .form-item select { width: 100%; border: 1px solid var(--border); border-radius: 6px; padding: 7px 10px; font-size: 13px; }
+.form-item input:disabled { background: #f9fafb; color: var(--muted); }
+.form-item input:focus, .form-item select:focus { outline: none; border-color: var(--brand); }
+.date-range { display: flex; align-items: center; gap: 6px; }
+.date-range input { flex: 1; min-width: 0; }
+.date-sep { color: var(--muted); font-size: 12px; }
+.field-hint { display: block; margin-top: 4px; color: #b54708; font-size: 12px; }
+.filter-item select { border: 1px solid var(--border); border-radius: 6px; padding: 6px 8px; font-size: 13px; background: #fff; }
+

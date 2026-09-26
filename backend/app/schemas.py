@@ -18,6 +18,8 @@ class PageResult(BaseModel, Generic[T]):
 class ActionResult(BaseModel):
     ok: bool
     message: str
+    # 机器可读的回执代码，方便前端按类型给出不同提示，如 DUPLICATE_PLAN、MISSING_FIELDS。
+    code: str | None = None
     entry: dict[str, Any] | None = None
 
 
